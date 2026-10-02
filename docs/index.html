@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#080e18">
+  <meta name="description" content="スペースキーひとつで軌道を切り替える、60秒のスコアアタック。赤をかわして、光を集めよう。">
+  <title>ORBIT SHIFT — 60秒の軌道ゲーム</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23080e18'/%3E%3Ccircle cx='32' cy='32' r='21' fill='none' stroke='%23244651' stroke-width='3'/%3E%3Ccircle cx='32' cy='32' r='13' fill='none' stroke='%23244651' stroke-width='3'/%3E%3Ccircle cx='32' cy='11' r='6' fill='%2390ffe0'/%3E%3C/svg%3E">
+  <style>
+@charset "UTF-8";
+:root{color-scheme:dark;--bg:#080e18;--surface:#0b1320;--line:#23313e;--muted:#8b9cae;--text:#ecf4f8;--mint:#90ffe0;--red:#ff6476;--font:Inter,"Helvetica Neue",Arial,"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);min-height:100svh;-webkit-font-smoothing:antialiased}button,a{-webkit-tap-highlight-color:transparent}button{font:inherit;cursor:pointer}button:disabled{cursor:default;opacity:.3}button:focus-visible,a:focus-visible{outline:2px solid var(--mint);outline-offset:5px}button{touch-action:manipulation}button,svg{flex-shrink:0}[hidden]{display:none!important}.arcade{width:min(1040px,calc(100% - 80px));margin:0 auto}.topbar{height:102px;display:flex;align-items:center;justify-content:space-between}.wordmark{color:var(--text);font-size:20px;letter-spacing:-.04em;font-weight:850;text-decoration:none;display:flex;align-items:center;gap:4px}.wordmark span{font-weight:450}.wordmark i{width:6px;height:6px;background:var(--mint);border-radius:50%;margin-left:3px}.top-actions{display:flex;align-items:center;gap:12px}.edition{font-size:12px;letter-spacing:.14em;color:var(--muted);margin-right:14px}.icon-button{width:40px;height:40px;border:1px solid var(--line);border-radius:50%;background:transparent;color:#bfd0dc;display:grid;place-items:center;transition:background .2s,color .2s}.icon-button:hover{background:#172333;color:var(--mint)}.icon-button svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}.sound-slash{display:none}.is-muted .sound-waves{display:none}.is-muted .sound-slash{display:block}.game{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:24px;background:var(--surface)}.hud{position:absolute;top:0;left:0;width:100%;padding:28px 32px;display:flex;justify-content:space-between;align-items:flex-start;z-index:2;pointer-events:none}.metric{display:flex;flex-direction:column;gap:7px;min-width:130px}.metric-label{font-size:12px;letter-spacing:.16em;color:#9bacbc}.metric strong{font-variant-numeric:tabular-nums;font-size:38px;letter-spacing:-.045em;font-weight:700;line-height:1.1}.combo,.best-label{font-size:12px;color:var(--muted);height:18px}.combo.active{color:var(--mint)}.best-label b{font-weight:500;color:#b2c2d0;font-variant-numeric:tabular-nums;letter-spacing:.04em;margin-left:5px}.time-metric{text-align:right;align-items:flex-end}.time-metric strong span{font-size:24px;color:#91a4b6;letter-spacing:-.025em}.mission{display:flex;flex-direction:column;align-items:center;gap:16px;padding-top:3px}.mission-label{font-size:11px;letter-spacing:.16em;color:#8396a9}.lives{display:flex;gap:7px}.lives i{width:7px;height:7px;border-radius:50%;background:var(--mint);box-shadow:0 0 12px #90ffe025;transition:background .2s}.lives i.lost{background:#314151;box-shadow:none}.arena{position:relative;height:min(610px,calc(100svh - 252px));min-height:500px;isolation:isolate;touch-action:manipulation}canvas{display:block;width:100%;height:100%}.overlay{position:absolute;inset:0;z-index:3;display:flex;align-items:center;justify-content:center;text-align:center;background:radial-gradient(ellipse at center,#0b132003 0%,#0b132025 60%,#0b132000 100%)}.start-content{padding-top:65px}.eyebrow{font-size:11px;letter-spacing:.16em;color:#9daebb;font-weight:500;display:block}.start-content .eyebrow{display:flex;justify-content:center;align-items:center;gap:8px}.eyebrow span{width:4px;height:4px;background:var(--mint);border-radius:50%}h1{font-size:clamp(64px,8vw,94px);font-weight:850;line-height:.91;letter-spacing:-.065em;margin:26px 0 22px}h1 span{color:var(--mint)}h1 em{font-style:normal;color:var(--mint)}.start-description{font-size:16px;line-height:1.9;color:#a6b6c4;margin:0 0 26px}.primary-button{min-height:52px;min-width:230px;border:0;border-radius:10px;display:inline-flex;gap:34px;justify-content:space-between;align-items:center;background:var(--mint);color:#0c2627;padding:14px 18px 14px 22px;font-size:15px;font-weight:700;box-shadow:0 4px 25px #90ffe00a;transition:transform .15s,background .15s,box-shadow .15s}.primary-button:hover{background:#adffeb;transform:translateY(-2px);box-shadow:0 6px 30px #90ffe022}.primary-button:active{transform:translateY(0)}kbd{font-family:var(--font);font-size:10px;border:1px solid #3b4f5c;border-radius:4px;padding:4px 6px;letter-spacing:.04em;font-weight:500;white-space:nowrap}.primary-button kbd{border-color:#0c262730;font-size:10px;padding:5px 7px;color:#204a45}.howto{display:flex;gap:21px;justify-content:center;font-size:14px;color:#90a2b3;margin-top:25px}.howto>span{display:flex;gap:7px;align-items:center}.legend-dot{width:7px;height:7px;border-radius:50%;background:var(--mint);box-shadow:0 0 8px #90ffe055}.legend-block{width:10px;height:5px;border-radius:2px;background:var(--red);transform:rotate(-20deg)}.legend-life{width:7px;height:7px;border-radius:50%;border:1px solid #afc6d6}.game-footer{height:68px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid #23313e70;padding:0 32px;color:#8498ab;font-size:14px;background:#0c1522}.control-hint{display:flex;align-items:center;gap:9px}.control-hint b{font-weight:400;color:#b3c1ce;margin-left:8px}.pause-hint{display:flex;align-items:center;gap:9px}.time-track{height:3px;background:#182733}.time-track i{display:block;height:100%;width:100%;background:var(--mint);box-shadow:0 0 12px #90ffe033;transform-origin:left}.page-footer{display:flex;justify-content:space-between;padding:22px 1px;color:#62758a;font-size:11px;letter-spacing:.05em}.page-footer span:first-child{letter-spacing:.13em}.switch-button{display:none}.cue{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);z-index:2;font-size:13px;letter-spacing:.08em;text-align:center;color:var(--mint);opacity:0;pointer-events:none;transition:opacity .2s;white-space:nowrap}.cue.show{opacity:1}.pause-overlay,.result-overlay{background:#080e18c9;backdrop-filter:blur(8px)}.panel-content{padding-top:48px}.panel-content h2{font-size:38px;letter-spacing:-.04em;margin:24px 0 12px}.panel-content p{color:#96a9bc;font-size:16px;margin:0 0 30px}.text-button{display:block;border:0;background:none;color:#91a4b7;font-size:13px;padding:12px 20px;margin:12px auto 0;border-radius:6px}.text-button:hover{color:var(--text);background:#172633}.result-content{padding:75px 20px 15px;position:relative}.result-content .eyebrow{color:var(--mint)}.result-content h2{font-size:38px;letter-spacing:-.055em;line-height:1;margin:18px 0 9px}.result-note{font-size:14px;color:#91a5b8;margin:0 0 24px;line-height:1.6}.result-score-label{font-size:10px;letter-spacing:.16em;color:#a2b4c3}.result-score{font-size:64px;letter-spacing:-.06em;line-height:1.15;font-weight:700;font-variant-numeric:tabular-nums;display:block}.new-record{font-size:10px;letter-spacing:.14em;color:var(--mint);margin:6px 0 0}.result-stats{display:flex;justify-content:center;gap:30px;margin:24px 0 26px}.result-stats>div{display:flex;flex-direction:column;gap:8px}.result-stats span{font-size:14px;color:#94a6b8}.result-stats b{font-size:18px;font-weight:550}.sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media(min-height:940px){.arcade{padding-top:25px}.arena{height:650px}.topbar{height:110px}}
+@media(max-width:760px){.arcade{width:calc(100% - 36px)}.topbar{height:78px}.edition{display:none}.game{border-radius:18px}.hud{padding:23px 22px}.metric{min-width:85px}.metric strong{font-size:31px}.time-metric strong span{font-size:20px}.mission-label{font-size:9px;letter-spacing:.1em}.mission{gap:13px}.arena{height:calc(100svh - 210px);min-height:460px;max-height:650px}.game-footer{height:66px;padding:0 22px}.control-hint b{font-size:11px;margin-left:0}.control-hint{gap:6px}.pause-hint{font-size:11px;gap:6px}.page-footer{font-size:10px;padding:18px 0}.start-content{padding-top:50px}h1{font-size:82px}.howto{gap:16px}.result-content{padding-top:72px}.result-content h2{font-size:34px}.result-note{margin-bottom:18px}.result-stats{margin:18px 0 22px}}
+@media(max-width:470px){.arcade{width:calc(100% - 24px)}.wordmark{font-size:18px}.top-actions{gap:8px}.icon-button{width:36px;height:36px}.hud{padding:21px 18px}.mission-label{display:none}.mission{padding-top:5px}.metric{min-width:95px}.arena{min-height:485px;height:calc(100svh - 207px)}.start-content{padding-top:58px}.start-content .eyebrow{display:none}h1{font-size:74px}.start-description{font-size:14px;margin-bottom:22px}.howto{font-size:12px;gap:12px}.game-footer{padding:0 18px}.control-hint{display:none}.switch-button{display:block;width:100%;height:40px;background:#142c32;color:var(--mint);border:1px solid #32524f;border-radius:7px;font-size:14px}.pause-hint{display:none}.page-footer{flex-direction:column;gap:8px;text-align:center}.result-content h2{font-size:32px}.result-score{font-size:56px}.result-stats{gap:25px}.cue{bottom:28px}}
+@media(prefers-reduced-motion:reduce){button,.cue{transition:none}.pause-overlay,.result-overlay{backdrop-filter:none}}
+
+</style>
+</head>
+<body>
+  <main class="arcade">
+    <header class="topbar">
+      <a class="wordmark" href="#" aria-label="ORBIT SHIFT ホーム">ORBIT<span>SHIFT</span><i aria-hidden="true"></i></a>
+      <div class="top-actions">
+        <span class="edition">60 SECOND ARCADE</span>
+        <button class="icon-button" id="sound-button" aria-label="音をオフにする" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><path class="sound-waves" d="M15 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/><path class="sound-slash" d="m16 9 5 6m0-6-5 6"/></svg></button>
+        <button class="icon-button" id="pause-button" aria-label="一時停止" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M16 5v14"/></svg></button>
+      </div>
+    </header>
+    <section class="game" aria-label="ORBIT SHIFT ゲーム">
+      <div class="hud">
+        <div class="metric score-metric"><span class="metric-label">SCORE</span><strong id="score">00000</strong><span class="combo" id="combo">光を集めよう</span></div>
+        <div class="mission"><span class="mission-label" id="phase">READY TO ORBIT</span><span class="lives" id="lives" aria-label="ライフ 3"><i></i><i></i><i></i></span></div>
+        <div class="metric time-metric"><span class="metric-label">TIME</span><strong id="time">60<span>.0</span></strong><span class="best-label">BEST <b id="best">00000</b></span></div>
+      </div>
+      <div class="arena" id="arena">
+        <canvas id="game-canvas" aria-label="円形の2つの軌道。スペースキーで軌道を切り替えます。"></canvas>
+        <div class="overlay" id="start-screen">
+          <div class="start-content">
+            <div class="eyebrow"><span></span> A LITTLE SHIFT. A GREAT ESCAPE.</div>
+            <h1>ORBIT<br><span>SHIFT</span><em>.</em></h1>
+            <p class="start-description">赤をかわす。光を集める。<br>たったひとつの操作で、60秒の夢中。</p>
+            <button class="primary-button" id="start-button">プレイする <kbd>SPACE</kbd></button>
+            <div class="howto"><span><i class="legend-dot"></i>光を集める</span><span><i class="legend-block"></i>赤をよける</span><span><i class="legend-life"></i>ライフは3つ</span></div>
+          </div>
+        </div>
+        <div class="overlay pause-overlay" id="pause-screen" hidden>
+          <div class="panel-content"><span class="eyebrow">TAKE A BREATH</span><h2>ひと休み。</h2><p id="pause-description">準備ができたら、軌道に戻ろう。</p><button class="primary-button" id="resume-button">つづける <kbd>SPACE</kbd></button><button class="text-button" id="restart-button">はじめから</button></div>
+        </div>
+        <div class="overlay result-overlay" id="result-screen" hidden>
+          <div class="result-content"><span class="eyebrow" id="result-eyebrow">RUN COMPLETE</span><h2 id="result-title">NICE ORBIT.</h2><p class="result-note" id="result-note"></p><div class="result-score-label">YOUR SCORE</div><strong class="result-score" id="result-score">0</strong><div class="new-record" id="new-record" hidden>NEW PERSONAL BEST</div><div class="result-stats"><div><span>回収した光</span><b id="result-pickups">0</b></div><div><span>最大コンボ</span><b id="result-combo">0</b></div><div><span>生存時間</span><b id="result-time">0秒</b></div></div><button class="primary-button" id="retry-button">もう一回 <kbd>SPACE</kbd></button><button class="text-button" id="home-button">タイトルへ</button></div>
+        </div>
+        <div class="cue" id="cue" aria-live="polite"></div>
+      </div>
+      <footer class="game-footer">
+        <span class="control-hint"><kbd>SPACE</kbd><span> / </span><span class="click-hint">クリック</span><b>軌道を切り替える</b></span>
+        <button class="switch-button" id="switch-button" disabled>軌道を切り替える</button>
+        <span class="pause-hint"><kbd>ESC</kbd> 一時停止</span>
+      </footer>
+      <div class="time-track" aria-hidden="true"><i id="time-fill"></i></div>
+    </section>
+    <footer class="page-footer"><span>ONE BUTTON. TWO ORBITS.</span><span>自己ベストは、このブラウザに記録。</span></footer>
+    <div class="sr-only" id="announcement" role="status" aria-live="polite"></div>
+  </main>
+  <script>
+/* ORBIT SHIFT — deterministic, renderer-independent game rules. */
+(function(root){
+  'use strict';
+  const DURATION=60, SWITCH_TIME=.14, SPAWN_ANGLE=3.85;
+  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+  function random(seed){let s=seed>>>0||1;return()=>{s+=0x6D2B79F5;let t=s;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296;};}
+  class Game {
+    constructor(seed=Date.now()){this.rng=random(seed);this.state='ready';this.reset();}
+    reset(){this.elapsed=0;this.score=0;this.lives=3;this.lane=1;this.laneMix=1;this.fromLane=1;this.switchLeft=0;this.invincible=0;this.rows=[];this.events=[];this.combo=0;this.maxCombo=0;this.pickups=0;this.misses=0;this.hits=0;this.nextSpawn=.55;this.rowId=0;this.lastHazard=0;this.streak=0;this.endReason=null;this.lastPhase=0;this.lastSecond=-1;this.finishBonus=0;}
+    start(){this.reset();this.state='playing';this.events.push({type:'start'});}
+    toggle(){if(this.state!=='playing'||this.switchLeft>0)return false;this.fromLane=this.laneMix;this.lane=1-this.lane;this.switchLeft=SWITCH_TIME;this.events.push({type:'switch',lane:this.lane});return true;}
+    pause(){if(this.state!=='playing')return false;this.state='paused';return true;}
+    resume(){if(this.state!=='paused')return false;this.state='playing';return true;}
+    home(){this.state='ready';this.reset();}
+    get speed(){return 1.7+.9*(this.elapsed/DURATION);}
+    get phase(){return this.elapsed<20?0:this.elapsed<40?1:2;}
+    get multiplier(){return Math.min(5,1+Math.floor(this.combo/6));}
+    get remaining(){return Math.max(0,DURATION-this.elapsed);}
+    spawn(){
+      let hazard;
+      if(this.rowId<2)hazard=0;
+      else {hazard=this.rng()<.5?0:1;if(this.streak>=2)hazard=1-this.lastHazard;}
+      this.streak=hazard===this.lastHazard?this.streak+1:1;this.lastHazard=hazard;
+      const row={id:++this.rowId,a:SPAWN_ANGLE,hazard,hit:false,passed:false,points:0,coins:[-.18,0,.18].map(offset=>({offset,collected:false,missed:false}))};
+      this.rows.push(row);
+      const rhythm=this.phase===0?[1.04,.94,1.04,1.14]:this.phase===1?[.83,.78,.94,.78]:[.66,.64,.8,.64];
+      this.nextSpawn+=rhythm[(this.rowId-1)%rhythm.length];
+    }
+    step(dt){
+      if(this.state!=='playing'||!Number.isFinite(dt)||dt<=0)return;
+      let left=Math.min(dt,.5);
+      while(left>1e-8&&this.state==='playing'){const s=Math.min(left,1/120);this.tick(s);left-=s;}
+    }
+    tick(dt){
+      this.elapsed=Math.min(DURATION,this.elapsed+dt);
+      if(this.switchLeft>0){this.switchLeft=Math.max(0,this.switchLeft-dt);const t=1-this.switchLeft/SWITCH_TIME,ease=t*t*(3-2*t);this.laneMix=this.fromLane+(this.lane-this.fromLane)*ease;}else this.laneMix=this.lane;
+      this.invincible=Math.max(0,this.invincible-dt);
+      if(this.phase!==this.lastPhase){this.lastPhase=this.phase;this.events.push({type:'phase',phase:this.phase});}
+      const second=Math.ceil(this.remaining);if(second<=5&&second>0&&second!==this.lastSecond){this.lastSecond=second;this.events.push({type:'countdown',second});}
+      if(this.elapsed>=this.nextSpawn&&this.remaining>1.7)this.spawn();
+      for(const row of this.rows){
+        row.a-=this.speed*dt;
+        if(!row.hit&&Math.abs(row.a)<.155&&Math.abs(this.laneMix-row.hazard)<.47&&this.invincible===0){
+          row.hit=true;this.lives--;this.hits++;this.combo=0;this.invincible=1.05;this.events.push({type:'hit',lane:row.hazard});
+          if(this.lives<=0){this.finish('crash');return;}
+        }
+        for(const coin of row.coins){
+          if(coin.collected||coin.missed)continue;
+          const angle=row.a+coin.offset;
+          if(Math.abs(angle)<.095&&Math.abs(this.laneMix-(1-row.hazard))<.4){
+            coin.collected=true;this.combo++;this.pickups++;this.maxCombo=Math.max(this.maxCombo,this.combo);const value=10*this.multiplier;this.score+=value;row.points=(row.points||0)+value;
+            this.events.push({type:'collect',lane:1-row.hazard,value,rowPoints:row.points,lastInRow:coin===row.coins[row.coins.length-1],combo:this.combo,multiplier:this.multiplier});
+            if(this.combo%6===0)this.events.push({type:'combo',combo:this.combo,multiplier:this.multiplier});
+          }else if(angle<-.12){coin.missed=true;this.misses++;if(this.combo>0){this.combo=0;this.events.push({type:'miss'});}}
+        }
+        if(!row.passed&&row.a<-.2){row.passed=true;if(!row.hit){this.score+=5;this.events.push({type:'pass'});}}
+      }
+      this.rows=this.rows.filter(row=>row.a>-1.1);
+      if(this.elapsed>=DURATION)this.finish('complete');
+    }
+    finish(reason){if(this.state!=='playing')return;this.endReason=reason;this.state='ended';if(reason==='complete'){this.finishBonus=300+this.lives*100;this.score+=this.finishBonus;}this.events.push({type:'end',reason,bonus:this.finishBonus});}
+    takeEvents(){const events=this.events;this.events=[];return events;}
+    snapshot(){return{state:this.state,score:this.score,remaining:Number(this.remaining.toFixed(1)),lives:this.lives,lane:this.lane===0?'inner':'outer',combo:this.combo,maxCombo:this.maxCombo,pickups:this.pickups,endReason:this.endReason};}
+  }
+  root.OrbitCore={Game,random,DURATION,SWITCH_TIME,SPAWN_ANGLE,clamp};
+  if(typeof module!=='undefined'&&module.exports)module.exports=root.OrbitCore;
+})(typeof globalThis==='object'?globalThis:window);
+
+</script>
+  <script>
+(()=>{
+  'use strict';
+  const $=id=>document.getElementById(id),canvas=$('game-canvas'),ctx=canvas.getContext('2d'),arena=$('arena');
+  if(!ctx){$('start-button').disabled=true;$('start-button').textContent='このブラウザではCanvasを利用できません';return;}
+  const {Game,clamp}=OrbitCore,game=new Game(),TAU=Math.PI*2,TOP=-Math.PI/2;
+  const mint='#90ffe0',red='#ff6476',gold='#f5dd8c';
+  const reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const font=getComputedStyle(document.body).fontFamily;
+  let width=0,height=0,dpr=1,cx=0,cy=0,radius=0,background=null,displayTime=0,last=0,lastHud=-1;
+  let particles=[],ripples=[],floaters=[],trail=[],flash=0,shake=0,cueUntil=0,clickUntil=0,spark=0,best=0,muted=false,musicBeat=-1;
+  let audio=null,audioMaster=null,recordAvailable=true,frameId=0,idleAt=0;
+  try {const n=Number(localStorage.getItem('orbit-shift-best-v1'));best=Number.isFinite(n)?Math.max(0,Math.floor(n)):0;muted=localStorage.getItem('orbit-shift-muted-v1')==='true';}catch{recordAvailable=false;}
+  function storage(key,value){try{localStorage.setItem(key,String(value));return true;}catch{return false;}}
+  function initAudio(){if(audio)return;try{const Audio=window.AudioContext||window.webkitAudioContext;if(!Audio)return;audio=new Audio();audioMaster=audio.createGain();audioMaster.gain.value=muted?0:.16;audioMaster.connect(audio.destination);}catch{audio=null;}}
+  function wakeAudio(){initAudio();if(audio?.state==='suspended')audio.resume().catch(()=>{});}
+  function tone(freq,duration=.1,type='sine',volume=.4,delay=0,endFreq){if(!audio||audio.state!=='running'||muted)return;try{const at=audio.currentTime+delay,osc=audio.createOscillator(),gain=audio.createGain();osc.type=type;osc.frequency.setValueAtTime(freq,at);if(endFreq)osc.frequency.exponentialRampToValueAtTime(endFreq,at+duration);gain.gain.setValueAtTime(0,at);gain.gain.linearRampToValueAtTime(volume,at+.006);gain.gain.exponentialRampToValueAtTime(.0001,at+duration);osc.connect(gain);gain.connect(audioMaster);osc.start(at);osc.stop(at+duration+.02);osc.onended=()=>{osc.disconnect();gain.disconnect();};}catch{}}
+  function sound(type,value=0){if(type==='switch'){tone(250,.075,'sine',.3,0,420);}if(type==='collect'){const scale=[523.25,659.25,783.99,1046.5,1318.5,1568];tone(scale[value%6],.13,'sine',.3);}if(type==='hit'){tone(100,.25,'sawtooth',.3,0,35);tone(65,.32,'triangle',.6);}if(type==='combo'){tone(523,.15,'triangle',.3);tone(784,.18,'triangle',.28,.07);tone(1046,.2,'sine',.28,.14);}if(type==='start'){[392,523,784].forEach((f,i)=>tone(f,.2,'sine',.32,i*.075));}if(type==='end'){const notes=value?[523,659,784,1046]:[392,294,196];notes.forEach((f,i)=>tone(f,.3,'triangle',.32,i*.1));}if(type==='countdown')tone(880,.07,'sine',.25);}
+  function updateSoundButton(){$('sound-button').classList.toggle('is-muted',muted);$('sound-button').setAttribute('aria-pressed',String(muted));$('sound-button').setAttribute('aria-label',muted?'音をオンにする':'音をオフにする');}
+  function toggleSound(){wakeAudio();muted=!muted;if(audioMaster)audioMaster.gain.setTargetAtTime(muted?0:.16,audio.currentTime,.03);storage('orbit-shift-muted-v1',muted);updateSoundButton();if(!muted)tone(660,.12,'sine',.25);}
+  function cue(text,seconds=1.7,color=mint){$('cue').textContent=text;$('cue').style.color=color;$('cue').classList.add('show');cueUntil=displayTime+seconds;}
+  function announce(text){$('announcement').textContent=text;}
+  function overlays(state){$('start-screen').hidden=state!=='ready';$('pause-screen').hidden=state!=='paused';$('result-screen').hidden=state!=='ended';$('pause-button').disabled=state==='ready'||state==='ended';$('pause-button').setAttribute('aria-label',state==='paused'?'ゲームを再開する':'一時停止');$('switch-button').disabled=state!=='playing';arena.style.cursor=state==='playing'?'pointer':'default';}
+  function resetEffects(){particles=[];ripples=[];floaters=[];trail=[];flash=0;shake=0;spark=0;musicBeat=-1;lastHud=-1;}
+  function start(){wakeAudio();game.start();resetEffects();overlays('playing');clickUntil=displayTime+.2;cue('SPACE / クリックで軌道を切り替える',2.7);announce('ゲーム開始。60秒間、赤をよけて光を集めてください。');document.activeElement?.blur();last=0;updateHud(true);}
+  function toggle(){if(game.toggle()){wakeAudio();ripples.push({x:cx,y:cy-playerRadius(),r:8,life:.4,max:.4,color:mint});}}
+  function pause(automatic=false){if(!game.pause())return;overlays('paused');$('pause-description').textContent=automatic?'画面を離れたので、一時停止しました。':'準備ができたら、軌道に戻ろう。';$('cue').classList.remove('show');announce('一時停止');$('resume-button').focus({preventScroll:true});}
+  function resume(){if(!game.resume())return;wakeAudio();overlays('playing');last=0;clickUntil=displayTime+.2;document.activeElement?.blur();announce('ゲーム再開');}
+  function home(){game.home();resetEffects();overlays('ready');$('cue').classList.remove('show');updateHud(true);$('start-button').focus({preventScroll:true});}
+  function handleMain(){if(game.state==='ready'||game.state==='ended')start();else if(game.state==='paused')resume();else toggle();}
+  function result(){
+    const previousBest=best,isBest=game.score>best;if(isBest){best=game.score;recordAvailable=storage('orbit-shift-best-v1',best);}
+    const complete=game.endReason==='complete';
+    $('result-eyebrow').textContent=complete?'60 SECONDS COMPLETE':'END OF ORBIT';
+    $('result-title').textContent=complete?(game.hits===0?'PERFECT ORBIT.':'NICE ORBIT.'):'ONE MORE SHIFT?';
+    $('result-note').textContent=complete?`60秒完走！ 完走ボーナス +${game.finishBonus}`:(game.elapsed<15?'赤が近づいたら、もう片方の軌道へ。':'次の光を見て、ひとつ先の軌道へ。');
+    $('result-score').textContent=game.score.toLocaleString('ja-JP');$('result-pickups').textContent=game.pickups;$('result-combo').textContent=game.maxCombo;$('result-time').textContent=`${game.elapsed.toFixed(1)}秒`;
+    $('new-record').hidden=!isBest;$('new-record').textContent=recordAvailable?'NEW PERSONAL BEST':'NEW BEST · 今回のプレイ中のみ';
+    overlays('ended');$('cue').classList.remove('show');updateHud(true);sound('end',complete?1:0);announce(`${complete?'60秒完走':'ゲーム終了'}。スコア${game.score}、最大コンボ${game.maxCombo}${isBest&&previousBest>0?'。自己ベスト更新':''}`);$('retry-button').focus({preventScroll:true});
+    if(complete&&!reducedMotion){for(let i=0;i<3;i++)burst(cx+(i-1)*radius*.45,cy-radius*.4,mint,24);}
+  }
+  function updateHud(force=false){if(!force&&displayTime-lastHud<.08)return;lastHud=displayTime;$('score').textContent=String(game.score).padStart(5,'0');const t=game.remaining.toFixed(1).split('.');$('time').innerHTML=`${t[0]}<span>.${t[1]}</span>`;$('time').style.color=game.remaining<=10&&game.state!=='ready'?gold:'';$('best').textContent=String(best).padStart(5,'0');$('combo').textContent=game.combo>0?`${game.combo} COMBO · ×${game.multiplier}`:'光を集めよう';$('combo').classList.toggle('active',game.combo>0);$('lives').setAttribute('aria-label',`ライフ ${game.lives}`);Array.from($('lives').children).forEach((i,n)=>i.classList.toggle('lost',n>=game.lives));$('phase').textContent=game.state==='ready'?'READY TO ORBIT':['01 / FIND YOUR FLOW','02 / PICK UP THE PACE','03 / INTO THE ZONE'][game.phase];$('time-fill').style.transform=`scaleX(${game.remaining/60})`;}
+  function playerRadius(){return radius*(.72+.28*game.laneMix);}
+  function point(angle,r){return{x:cx+Math.cos(TOP+angle)*r,y:cy+Math.sin(TOP+angle)*r};}
+  function burst(x,y,color,count=10){if(reducedMotion)count=3;for(let i=0;i<count;i++){const a=Math.random()*TAU,v=30+Math.random()*130;particles.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life:.25+Math.random()*.4,max:.65,size:1+Math.random()*2,color});}if(particles.length>180)particles.splice(0,particles.length-180);}
+  function events(){for(const e of game.takeEvents()){
+    if(e.type==='start')sound('start');
+    if(e.type==='switch')sound('switch');
+    if(e.type==='collect'){const p=point(0,radius*(e.lane===0?.72:1));burst(p.x,p.y,mint,6);spark=.2;sound('collect',e.combo);if(e.lastInRow){floaters.push({x:p.x+22,y:p.y-14,text:`+${e.rowPoints}`,life:.65,color:mint});}}
+    if(e.type==='combo'&&(e.combo<=24||e.combo%30===0)){sound('combo');cue(e.combo<=24?`×${e.multiplier} COMBO`:`${e.combo} COMBO`,1.1);ripples.push({x:cx,y:cy,r:radius*.38,life:.65,max:.65,color:mint});}
+    if(e.type==='hit'){flash=.32;shake=reducedMotion?0:.28;sound('hit');burst(cx,cy-playerRadius(),red,20);cue('HIT · ライフ −1',1.2,red);announce(`障害物に接触。残りライフ${game.lives}`);}
+    if(e.type==='phase'){cue(e.phase===1?'テンポアップ':'ラスト20秒',1.8,e.phase===2?gold:mint);sound('combo');}
+    if(e.type==='countdown')sound('countdown');
+    if(e.type==='end')result();
+  }}
+  const stars=Array.from({length:60},()=>({x:Math.random(),y:Math.random(),a:.12+Math.random()*.35,r:Math.random()>.88?1.1:.55}));
+  function resize(){const box=canvas.getBoundingClientRect();width=box.width;height=box.height;dpr=Math.min(window.devicePixelRatio||1,1.75);canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);cx=width/2;cy=height*.55;radius=Math.min(width*.36,height*.355);background=document.createElement('canvas');background.width=canvas.width;background.height=canvas.height;const bg=background.getContext('2d');bg.scale(dpr,dpr);const gradient=bg.createRadialGradient(cx,cy,0,cx,cy,radius*1.9);gradient.addColorStop(0,'#102531');gradient.addColorStop(.55,'#0c1926');gradient.addColorStop(1,'#0b1320');bg.fillStyle=gradient;bg.fillRect(0,0,width,height);for(const star of stars){bg.fillStyle=`rgba(129,184,195,${star.a})`;bg.beginPath();bg.arc(star.x*width,star.y*height,star.r,0,TAU);bg.fill();}trail=[];draw();}
+  function arc(r,start,end,color,line=1,alpha=1){ctx.globalAlpha=alpha;ctx.beginPath();ctx.arc(cx,cy,r,TOP+start,TOP+end);ctx.strokeStyle=color;ctx.lineWidth=line;ctx.stroke();ctx.globalAlpha=1;}
+  function dot(p,r,color,alpha=1){ctx.globalAlpha=alpha;ctx.beginPath();ctx.arc(p.x,p.y,r,0,TAU);ctx.fillStyle=color;ctx.fill();ctx.globalAlpha=1;}
+  function obstacle(a,lane,alpha=1){const r=radius*(lane===0?.72:1),w=radius<140?11:15;ctx.lineCap='round';arc(r,a-.075,a+.075,'#ff647619',w+12,alpha);arc(r,a-.075,a+.075,red,w,alpha);arc(r,a-.055,a+.055,'#ffa5ae',2,alpha*.65);ctx.lineCap='butt';}
+  function coin(a,lane,alpha=1){const r=radius*(lane===0?.72:1),p=point(a,r),s=radius<140?3.2:4.2;dot(p,s+5,'#90ffe015',alpha);ctx.save();ctx.translate(p.x,p.y);ctx.rotate(TOP+a+Math.PI/4);ctx.globalAlpha=alpha;ctx.fillStyle=mint;ctx.fillRect(-s,-s,s*2,s*2);ctx.restore();}
+  function draw(){if(!width||!background)return;ctx.setTransform(1,0,0,1,0,0);ctx.globalAlpha=1;ctx.drawImage(background,0,0);ctx.setTransform(dpr,0,0,dpr,0,0);ctx.save();if(shake>0){ctx.translate((Math.random()-.5)*shake*18,(Math.random()-.5)*shake*18);}
+    const ready=game.state==='ready';
+    for(let i=0;i<60;i++){const a=TAU*i/60,r=radius*1.16,p=point(a,r),q=point(a,r+(i%5===0?6:3));ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.strokeStyle=i%5===0?'#314b59':'#1c3340';ctx.lineWidth=1;ctx.stroke();}
+    arc(radius*1.1,0,TAU,'#18303c',1,.8);
+    [radius*.72,radius].forEach((r,i)=>{arc(r,0,TAU,'#162d39',25,1);arc(r,0,TAU,'#2c4652',1,1);ctx.setLineDash([2,11]);ctx.lineDashOffset=displayTime*13;arc(r,0,TAU,'#496371',1,.3);ctx.setLineDash([]);arc(r,-.25,.25,'#90ffe0',1,(1-Math.abs(game.laneMix-i))*.6);});
+    if(!ready){ctx.beginPath();ctx.moveTo(cx,cy-radius*1.085);ctx.lineTo(cx,cy-radius*.625);ctx.strokeStyle='#90ffe023';ctx.lineWidth=1;ctx.stroke();dot({x:cx,y:cy-radius*1.12},2,mint,.7);}
+    if(!ready){for(const row of game.rows){const alpha=clamp((3.85-row.a)/.35,0,1)*(row.a<-.25?clamp(1-(-row.a-.25)/.65,0,1):1);if(!row.hit)obstacle(row.a,row.hazard,alpha);for(const c of row.coins)if(!c.collected&&!c.missed)coin(row.a+c.offset,1-row.hazard,alpha);}}
+    ctx.globalAlpha=1;
+    if(!ready){
+      arc(radius*.41,0,TAU,'#1f3641',2,.8);arc(radius*.41,0,TAU*(game.remaining/60),game.remaining<=10?gold:'#587f84',2,.55);
+      ctx.textAlign='center';ctx.fillStyle=game.combo>=6?mint:'#c5d6df';ctx.font=`500 ${Math.max(24,radius*.21)}px ${font}`;ctx.fillText(`×${game.multiplier}`,cx,cy+5);ctx.fillStyle='#718c9e';ctx.font='12px Arial,sans-serif';ctx.fillText(game.combo?`${game.combo} COMBO`:'KEEP YOUR FLOW',cx,cy+25);
+      const r=playerRadius(),blink=game.invincible>0&&Math.floor(displayTime*13)%2===0;
+      if(!blink){for(let i=trail.length-1;i>=0;i--){const t=trail[i];dot({x:cx-((trail.length-1-i)*2.7),y:cy-t.r+((trail.length-1-i)*.17)},Math.max(1,5.5*(i/trail.length)),mint,(i/trail.length)*.26);}dot({x:cx,y:cy-r},15+(spark>0?spark*20:0),'#90ffe00b');dot({x:cx,y:cy-r},10,'#90ffe025');dot({x:cx,y:cy-r},6.5,mint);dot({x:cx+1,y:cy-r-1},2.5,'#eafff8');}
+    }else{dot(point(displayTime*.24,radius),6,mint,.55);}
+    for(const p of particles)dot(p,p.size,p.color,clamp(p.life/p.max,0,1));
+    for(const r of ripples){const alpha=r.life/r.max;ctx.globalAlpha=alpha*.4;ctx.beginPath();ctx.arc(r.x,r.y,r.r+(1-alpha)*55,0,TAU);ctx.strokeStyle=r.color;ctx.lineWidth=1;ctx.stroke();ctx.globalAlpha=1;}
+    ctx.textAlign='center';ctx.font='600 13px Arial,sans-serif';for(const f of floaters){ctx.globalAlpha=clamp(f.life/.4,0,1);ctx.fillStyle=f.color;ctx.fillText(f.text,f.x,f.y);}ctx.globalAlpha=1;ctx.restore();
+    if(flash>0){ctx.fillStyle=`rgba(255,100,118,${flash*.26})`;ctx.fillRect(0,0,width,height);}
+  }
+  function frame(now){
+    frameId=0;
+    if(document.hidden){last=0;return;}
+    if(game.state!=='playing'&&now-idleAt<32){frameId=requestAnimationFrame(frame);return;}
+    idleAt=now;
+    let dt=last?Math.max(0,(now-last)/1000):0;last=now;if(dt>1&&game.state==='playing'){pause(true);dt=0;}dt=Math.min(dt,.15);displayTime+=dt;
+    if(game.state==='playing')game.step(dt);events();
+    if(game.state!=='paused'){
+      flash=Math.max(0,flash-dt);shake=Math.max(0,shake-dt);spark=Math.max(0,spark-dt);for(const p of particles){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=Math.exp(-dt*2);p.vy*=Math.exp(-dt*2);p.life-=dt;}particles=particles.filter(p=>p.life>0);for(const r of ripples)r.life-=dt;ripples=ripples.filter(r=>r.life>0);for(const f of floaters){f.y-=dt*35;f.life-=dt;}floaters=floaters.filter(f=>f.life>0);
+      if(game.state==='playing'&&!reducedMotion){trail.push({r:playerRadius()});if(trail.length>15)trail.shift();}
+    }
+    if(cueUntil&&displayTime>cueUntil){$('cue').classList.remove('show');cueUntil=0;}
+    if(game.state==='playing'&&audio&&!muted){const beat=Math.floor(game.elapsed/(game.phase===0?.52:game.phase===1?.43:.36));if(beat!==musicBeat){musicBeat=beat;const notes=[65.4,65.4,82.4,98];tone(notes[Math.floor(beat/4)%4],.12,'sine',.13);if(beat%4===2)tone(196,.045,'triangle',.06);}}
+    updateHud();draw();frameId=requestAnimationFrame(frame);
+  }
+  $('start-button').addEventListener('click',start);$('retry-button').addEventListener('click',start);$('restart-button').addEventListener('click',start);$('resume-button').addEventListener('click',resume);$('home-button').addEventListener('click',home);$('sound-button').addEventListener('click',toggleSound);$('pause-button').addEventListener('click',()=>game.state==='paused'?resume():pause());$('switch-button').addEventListener('click',toggle);
+  document.querySelector('.wordmark').addEventListener('click',e=>{e.preventDefault();if(game.state==='playing')pause();else home();});
+  arena.addEventListener('pointerdown',e=>{if(game.state!=='playing'||e.target.closest('button')||displayTime<clickUntil)return;e.preventDefault();toggle();});
+  window.addEventListener('keydown',e=>{if(e.repeat||e.ctrlKey||e.metaKey||e.altKey)return;if(e.code==='Space'){e.preventDefault();handleMain();}else if(e.code==='Escape'||e.code==='KeyP'){e.preventDefault();if(game.state==='playing')pause();else if(game.state==='paused')resume();}else if(e.code==='KeyM'){e.preventDefault();toggleSound();}else if(e.code==='Enter'&&game.state==='playing'&&e.target===document.body){e.preventDefault();toggle();}});
+  document.addEventListener('visibilitychange',()=>{cancelAnimationFrame(frameId);frameId=0;last=0;if(document.hidden){pause(true);if(audio?.state==='running')audio.suspend().catch(()=>{});}else frameId=requestAnimationFrame(frame);});
+  let resizeFrame=0;new ResizeObserver(()=>{cancelAnimationFrame(resizeFrame);resizeFrame=requestAnimationFrame(resize);}).observe(arena);
+  if(!recordAvailable)document.querySelector('.page-footer span:last-child').textContent='自己ベストは、今回のプレイ中に記録。';
+  updateSoundButton();updateHud(true);resize();frameId=requestAnimationFrame(frame);
+  if(document.modelContext?.registerTool){
+    const lifecycle=new AbortController(),empty={type:'object',properties:{},additionalProperties:false};
+    function validate(input){if(input===null||typeof input!=='object'||Array.isArray(input)||Object.keys(input).length)throw new Error('引数には空のオブジェクトを指定してください。');}
+    const tools=[
+      {name:'read_orbit_game',title:'ゲームの状態を見る',description:'現在のスコア、ライフ、軌道、残り時間を返す。',inputSchema:empty,annotations:{readOnlyHint:true,untrustedContentHint:false},execute(input){validate(input);return game.snapshot();}},
+      {name:'start_orbit_game',title:'ゲームを始める',description:'タイトルまたは結果画面から、新しい60秒のゲームを開始する。',inputSchema:empty,annotations:{readOnlyHint:false,untrustedContentHint:false},execute(input){validate(input);if(game.state!=='ready'&&game.state!=='ended')throw new Error('現在のゲームを終了してから開始してください。');start();return game.snapshot();}},
+      {name:'switch_orbit',title:'軌道を切り替える',description:'プレイ中の内側と外側の軌道を切り替える。',inputSchema:empty,annotations:{readOnlyHint:false,untrustedContentHint:false},execute(input){validate(input);if(game.state!=='playing')throw new Error('プレイ中にのみ軌道を切り替えられます。');if(game.switchLeft>0)throw new Error('切り替え中です。');toggle();return game.snapshot();}},
+      {name:'pause_orbit_game',title:'一時停止する',description:'プレイ中のゲームを一時停止する。',inputSchema:empty,annotations:{readOnlyHint:false,untrustedContentHint:false},execute(input){validate(input);if(game.state!=='playing')throw new Error('プレイ中にのみ一時停止できます。');pause();return game.snapshot();}},
+      {name:'resume_orbit_game',title:'ゲームを再開する',description:'一時停止しているゲームを再開する。',inputSchema:empty,annotations:{readOnlyHint:false,untrustedContentHint:false},execute(input){validate(input);if(game.state!=='paused')throw new Error('一時停止中にのみ再開できます。');resume();return game.snapshot();}}
+    ];
+    for(const tool of tools){try{Promise.resolve(document.modelContext.registerTool(tool,{signal:lifecycle.signal})).catch(()=>{});}catch{}}window.addEventListener('pagehide',()=>lifecycle.abort(),{once:true});
+  }
+})();
+
+</script>
+</body>
+</html>

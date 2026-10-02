@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#080e18">
+  <meta name="description" content="スペースキーひとつで軌道を切り替える、60秒のスコアアタック。赤をかわして、光を集めよう。">
+  <title>ORBIT SHIFT — 60秒の軌道ゲーム</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23080e18'/%3E%3Ccircle cx='32' cy='32' r='21' fill='none' stroke='%23244651' stroke-width='3'/%3E%3Ccircle cx='32' cy='32' r='13' fill='none' stroke='%23244651' stroke-width='3'/%3E%3Ccircle cx='32' cy='11' r='6' fill='%2390ffe0'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="arcade">
+    <header class="topbar">
+      <a class="wordmark" href="#" aria-label="ORBIT SHIFT ホーム">ORBIT<span>SHIFT</span><i aria-hidden="true"></i></a>
+      <div class="top-actions">
+        <span class="edition">60 SECOND ARCADE</span>
+        <button class="icon-button" id="sound-button" aria-label="音をオフにする" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><path class="sound-waves" d="M15 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/><path class="sound-slash" d="m16 9 5 6m0-6-5 6"/></svg></button>
+        <button class="icon-button" id="pause-button" aria-label="一時停止" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M16 5v14"/></svg></button>
+      </div>
+    </header>
+    <section class="game" aria-label="ORBIT SHIFT ゲーム">
+      <div class="hud">
+        <div class="metric score-metric"><span class="metric-label">SCORE</span><strong id="score">00000</strong><span class="combo" id="combo">光を集めよう</span></div>
+        <div class="mission"><span class="mission-label" id="phase">READY TO ORBIT</span><span class="lives" id="lives" aria-label="ライフ 3"><i></i><i></i><i></i></span></div>
+        <div class="metric time-metric"><span class="metric-label">TIME</span><strong id="time">60<span>.0</span></strong><span class="best-label">BEST <b id="best">00000</b></span></div>
+      </div>
+      <div class="arena" id="arena">
+        <canvas id="game-canvas" aria-label="円形の2つの軌道。スペースキーで軌道を切り替えます。"></canvas>
+        <div class="overlay" id="start-screen">
+          <div class="start-content">
+            <div class="eyebrow"><span></span> A LITTLE SHIFT. A GREAT ESCAPE.</div>
+            <h1>ORBIT<br><span>SHIFT</span><em>.</em></h1>
+            <p class="start-description">赤をかわす。光を集める。<br>たったひとつの操作で、60秒の夢中。</p>
+            <button class="primary-button" id="start-button">プレイする <kbd>SPACE</kbd></button>
+            <div class="howto"><span><i class="legend-dot"></i>光を集める</span><span><i class="legend-block"></i>赤をよける</span><span><i class="legend-life"></i>ライフは3つ</span></div>
+          </div>
+        </div>
+        <div class="overlay pause-overlay" id="pause-screen" hidden>
+          <div class="panel-content"><span class="eyebrow">TAKE A BREATH</span><h2>ひと休み。</h2><p id="pause-description">準備ができたら、軌道に戻ろう。</p><button class="primary-button" id="resume-button">つづける <kbd>SPACE</kbd></button><button class="text-button" id="restart-button">はじめから</button></div>
+        </div>
+        <div class="overlay result-overlay" id="result-screen" hidden>
+          <div class="result-content"><span class="eyebrow" id="result-eyebrow">RUN COMPLETE</span><h2 id="result-title">NICE ORBIT.</h2><p class="result-note" id="result-note"></p><div class="result-score-label">YOUR SCORE</div><strong class="result-score" id="result-score">0</strong><div class="new-record" id="new-record" hidden>NEW PERSONAL BEST</div><div class="result-stats"><div><span>回収した光</span><b id="result-pickups">0</b></div><div><span>最大コンボ</span><b id="result-combo">0</b></div><div><span>生存時間</span><b id="result-time">0秒</b></div></div><button class="primary-button" id="retry-button">もう一回 <kbd>SPACE</kbd></button><button class="text-button" id="home-button">タイトルへ</button></div>
+        </div>
+        <div class="cue" id="cue" aria-live="polite"></div>
+      </div>
+      <footer class="game-footer">
+        <span class="control-hint"><kbd>SPACE</kbd><span> / </span><span class="click-hint">クリック</span><b>軌道を切り替える</b></span>
+        <button class="switch-button" id="switch-button" disabled>軌道を切り替える</button>
+        <span class="pause-hint"><kbd>ESC</kbd> 一時停止</span>
+      </footer>
+      <div class="time-track" aria-hidden="true"><i id="time-fill"></i></div>
+    </section>
+    <footer class="page-footer"><span>ONE BUTTON. TWO ORBITS.</span><span>自己ベストは、このブラウザに記録。</span></footer>
+    <div class="sr-only" id="announcement" role="status" aria-live="polite"></div>
+  </main>
+  <script src="game-core.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
